@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 from google import genai
 import json
 from google.genai import types
+from app.utils.config import TEXT_GENERATOR_MODELS
 
 class GeminiService:
 
@@ -25,15 +26,18 @@ class GeminiService:
     def generate(
         self,
         prompt: str,
-        model: str | None = None
     ) -> str:
 
-        model_name = model or self.default_model
-
-        response = self.client.models.generate_content(
-            model=model_name,
-            contents=prompt
-        )
+        for model in TEXT_GENERATOR_MODELS:
+            try:
+                print(f"Trying to generate text with model: {model}")
+                response = self.client.models.generate_content(
+                    model=model,
+                    contents=prompt
+                )
+                break  # Exit the loop if the request is successful
+            except Exception as e:
+                print(f"Error with model {model}: {e}")
 
         return response.text.strip()
     

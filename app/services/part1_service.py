@@ -3,7 +3,6 @@ import uuid
 
 from app.services.gemini_service import GeminiService
 
-
 class Part1Service:
 
     TOPICS = [
