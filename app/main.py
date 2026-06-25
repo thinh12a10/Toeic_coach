@@ -27,11 +27,14 @@ app.mount(
 )
 
 @app.get("/")
-def root():
+def root(
+    request: Request
+):
 
-    return {
-        "message": "TOEIC AI is running"
-    }
+    return templates.TemplateResponse(
+        request=request,
+        name="index.html"
+    )
 
 @app.get("/part1")
 def part1_page(
