@@ -24,24 +24,10 @@ class Part1EvaluationService:
             original_text
         )
 
-        response = self.gemini.client.models.generate_content(
-            model=self.gemini.default_model,
-            contents=[
-                types.Part.from_bytes(
-                    data=audio_bytes,
-                    mime_type="audio/webm"
-                ),
-                prompt
-            ],
-            config=types.GenerateContentConfig(
-                temperature=0.2,
-                response_mime_type="application/json",
-                response_schema=self._response_schema()
-            )
-        )
-
-        result = json.loads(
-            response.text
+        result = self.gemini.generate_json(
+            audio_bytes,
+            prompt,
+            self._response_schema(),
         )
 
         total_score = (

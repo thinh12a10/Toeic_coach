@@ -12,19 +12,42 @@ let audioChunks = [];
 
 async function loadQuestion() {
 
-    const response = await fetch(
-        "/api/part1/generate"
-    );
+    const questionEl = document.getElementById("question-text");
+    const loadingEl = document.getElementById("loading-indicator");
+    const nextBtn = document.getElementById("next-btn");
 
-    currentQuestion = await response.json();
+    // Show loading indicator and disable button
+    if (loadingEl) {
+        loadingEl.style.display = "flex";
+    }
+    questionEl.innerText = "";
+    nextBtn.disabled = true;
+    nextBtn.innerText = "Loading...";
 
-    document.getElementById(
-        "question-text"
-    ).innerText = currentQuestion.text;
+    try {
+        const response = await fetch(
+            "/api/part1/generate"
+        );
 
-    document.getElementById(
-        "evaluation-result"
-    ).innerHTML = "Waiting for evaluation...";
+        currentQuestion = await response.json();
+
+        questionEl.innerText = currentQuestion.text;
+
+        document.getElementById(
+            "evaluation-result"
+        ).innerHTML = "Waiting for evaluation...";
+    } catch (error) {
+        console.error("Failed to load question:", error);
+        questionEl.innerText =
+            "Failed to load question. Please try again.";
+    } finally {
+        // Hide loading indicator and re-enable button
+        if (loadingEl) {
+            loadingEl.style.display = "none";
+        }
+        nextBtn.disabled = false;
+        nextBtn.innerText = "Next Question";
+    }
 }
 
 
@@ -111,6 +134,11 @@ async function evaluateAudio(
         return;
     }
 
+    const evaluateLoading = document.getElementById("loading-evaluation-indicator");
+    if (evaluateLoading) {
+        evaluateLoading.style.display = "flex";
+    }
+
     const formData =
         new FormData();
 
@@ -125,11 +153,6 @@ async function evaluateAudio(
         "recording.webm"
     );
 
-    document.getElementById(
-        "evaluation-result"
-    ).innerHTML =
-        "Evaluating...";
-
     const response =
         await fetch(
             "/api/part1/evaluate",
@@ -142,6 +165,10 @@ async function evaluateAudio(
     const result =
         await response.json();
 
+    if (evaluateLoading) {
+        evaluateLoading.style.display = "none";
+    }
+    
     displayResult(
         result
     );

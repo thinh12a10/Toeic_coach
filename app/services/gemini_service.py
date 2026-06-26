@@ -5,6 +5,7 @@ from google import genai
 import json
 from google.genai import types
 from app.utils.config import TEXT_GENERATOR_MODELS
+from app.utils.config import EVALUATION_MODELS
 
 class GeminiService:
 
@@ -43,19 +44,31 @@ class GeminiService:
     
     def generate_json(
         self,
+        audio_bytes: bytes,
         prompt: str,
-        response_schema: dict
+        response_schema: dict[str, any]
     ):
-
-        response = self.client.models.generate_content(
-            model=self.default_model,
-            contents=prompt,
-            config=types.GenerateContentConfig(
-                temperature=0.2,
-                response_mime_type="application/json",
-                response_schema=response_schema
-            )
-        )
+        for model in EVALUATION_MODELS:
+            try:
+                print(f"Trying to generate JSON with model: {model}")
+                response = self.client.models.generate_content(
+                    model=model,
+                    contents=[
+                        types.Part.from_bytes(
+                            data=audio_bytes,
+                            mime_type="audio/webm"
+                        ),
+                        prompt
+                    ],
+                    config=types.GenerateContentConfig(
+                        temperature=0.2,
+                        response_mime_type="application/json",
+                        response_schema=response_schema
+                    )
+                )
+                break  # Exit the loop if the request is successful
+            except Exception as e:
+                print(f"Error with model {model}: {e}")
 
         return json.loads(
             response.text
