@@ -55,3 +55,9 @@ EVALUATION_MODELS = [
     "models/gemini-2.0-flash-lite",
     "models/gemini-2.0-flash-lite-001"
 ]
+
+IMAGE_GENERATION_MODELS = [
+    "models/imagen-4.0-generate-001",
+    "models/imagen-4.0-ultra-generate-001",
+    "models/imagen-4.0-standard-generate-001"
+]

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TOEIC Speaking - Part 2</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body>
+    <div class="page-shell">
+        <header class="part2-header">
+            <div>
+                <p class="eyebrow">TOEIC Speaking Practice</p>
+                <h1>TOEIC Speaking - Part 2</h1>
+                <p class="subtitle">Describe the picture clearly and naturally in 30 seconds.</p>
+            </div>
+            <div id="question-number" class="header-badge">Question 1</div>
+        </header>
+
+        <main class="part2-grid">
+            <section class="panel">
+                <div class="panel-heading">
+                    <span>Picture Prompt</span>
+                    <span>Describe the image</span>
+                </div>
+
+                <div id="loading-image-indicator" class="loading-indicator" style="display: none;">
+                    <span class="spinner"></span>
+                    <span class="loading-text">Loading image...</span>
+                </div>
+
+                <div class="image-wrapper">
+                    <img id="question-image" class="question-image" alt="Picture prompt" style="display: none;">
+                    <div id="image-placeholder" class="empty-state" style="display: flex;">
+                        <h3>Picture will appear here</h3>
+                        <p>Use the controls below to load the next prompt.</p>
+                    </div>
+                </div>
+
+                <div class="prompt-card">
+                    <h3>Instruction</h3>
+                    <p>Talk about the main scene, key details, and what is happening in the picture.</p>
+                </div>
+            </section>
+
+            <section class="panel">
+                <div class="panel-heading">
+                    <span>Evaluation Result</span>
+                    <span>AI Feedback</span>
+                </div>
+
+                <div id="loading-evaluation-indicator" class="loading-indicator" style="display: none;">
+                    <span class="spinner"></span>
+                    <span class="loading-text">Analyzing your response...</span>
+                </div>
+
+                <div id="evaluation-result">
+                    <div class="empty-state">
+                        <strong>Press Start Record to begin.</strong>
+                        <p>Your speech transcript and AI feedback will appear here once recording is complete.</p>
+                    </div>
+                </div>
+
+                <div class="result-card" style="margin-top: 14px;">
+                    <h3>Transcript</h3>
+                    <p id="transcript-result">Press Start Record to begin.</p>
+                </div>
+            </section>
+        </main>
+
+        <div class="controls-bar">
+            <div id="timer-display" class="timer-display">30s</div>
+            <div id="recording-status" class="recording-status">Ready</div>
+            <button id="start-record-btn">Start Record</button>
+            <button id="next-question-btn" class="secondary-btn">Next Question</button>
+            <button id="back-btn" class="secondary-btn">Back</button>
+        </div>
+    </div>
+
+    <script src="/static/part2.js"></script>
+</body>
+
+</html>

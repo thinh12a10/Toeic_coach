@@ -10,6 +10,9 @@ templates = Jinja2Templates(
 from app.routers.part1_router import (
     router as part1_router
 )
+from app.routers.part2_router import (
+    router as part2_router
+)
 
 app = FastAPI(
     title="TOEIC AI",
@@ -18,6 +21,9 @@ app = FastAPI(
 
 app.include_router(
     part1_router
+)
+app.include_router(
+    part2_router
 )
 
 app.mount(
@@ -44,4 +50,14 @@ def part1_page(
     return templates.TemplateResponse(
         request=request,
         name="part1.html"
+    )
+
+@app.get("/part2")
+def part2_page(
+    request: Request
+):
+
+    return templates.TemplateResponse(
+        request=request,
+        name="part2.html"
     )

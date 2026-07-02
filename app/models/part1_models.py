@@ -1,3 +1,5 @@
+from typing import Optional
+
 from pydantic import BaseModel
 
 
@@ -10,6 +12,7 @@ class Part1QuestionResponse(BaseModel):
     response_time: int
     text: str
     topic: str
+    image_url: Optional[str] = None
 
 
 class EvaluationCategory(BaseModel):
@@ -48,3 +51,4 @@ class Part1EvaluationResponse(BaseModel):
     total_score: float
 
     study_plan: list[str]
+    transcript: Optional[str] = None

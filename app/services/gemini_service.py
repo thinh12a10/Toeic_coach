@@ -1,53 +1,58 @@
+import json
 import os
+from typing import Any
 
 from dotenv import load_dotenv
 from google import genai
-import json
 from google.genai import types
-from app.utils.config import TEXT_GENERATOR_MODELS
-from app.utils.config import EVALUATION_MODELS
+
+from app.utils.config import EVALUATION_MODELS, TEXT_GENERATOR_MODELS
+
 
 class GeminiService:
 
     def __init__(self):
-        load_dotenv()  # Load environment variables from .env file
+        load_dotenv()
         api_key = os.getenv("GEMINI_API_KEY")
 
-        if not api_key:
-            raise ValueError(
-                "GEMINI_API_KEY environment variable is not set."
-            )
-
-        self.client = genai.Client(
-            api_key=api_key
-        )
-
+        self.client = None
         self.default_model = "gemini-2.5-flash"
 
-    def generate(
-        self,
-        prompt: str,
-    ) -> str:
+        if not api_key:
+            print("GEMINI_API_KEY is not set. Gemini features will be unavailable.")
+            return
 
+        self.client = genai.Client(api_key=api_key)
+
+    def generate(self, prompt: str) -> str:
+        if not self.client:
+            raise RuntimeError("Gemini API is not available. Please configure GEMINI_API_KEY.")
+
+        last_error = None
         for model in TEXT_GENERATOR_MODELS:
             try:
                 print(f"Trying to generate text with model: {model}")
                 response = self.client.models.generate_content(
                     model=model,
-                    contents=prompt
+                    contents=prompt,
                 )
-                break  # Exit the loop if the request is successful
-            except Exception as e:
-                print(f"Error with model {model}: {e}")
+                return response.text.strip()
+            except Exception as exc:
+                last_error = exc
+                print(f"Error with model {model}: {exc}")
 
-        return response.text.strip()
-    
+        raise RuntimeError(f"Failed to generate content: {last_error}")
+
     def generate_json(
         self,
         audio_bytes: bytes,
         prompt: str,
-        response_schema: dict[str, any]
+        response_schema: dict[str, Any],
     ):
+        if not self.client:
+            raise RuntimeError("Gemini API is not available. Please configure GEMINI_API_KEY.")
+
+        last_error = None
         for model in EVALUATION_MODELS:
             try:
                 print(f"Trying to generate JSON with model: {model}")
@@ -56,20 +61,19 @@ class GeminiService:
                     contents=[
                         types.Part.from_bytes(
                             data=audio_bytes,
-                            mime_type="audio/webm"
+                            mime_type="audio/webm",
                         ),
-                        prompt
+                        prompt,
                     ],
                     config=types.GenerateContentConfig(
                         temperature=0.2,
                         response_mime_type="application/json",
-                        response_schema=response_schema
-                    )
+                        response_schema=response_schema,
+                    ),
                 )
-                break  # Exit the loop if the request is successful
-            except Exception as e:
-                print(f"Error with model {model}: {e}")
+                return json.loads(response.text)
+            except Exception as exc:
+                last_error = exc
+                print(f"Error with model {model}: {exc}")
 
-        return json.loads(
-            response.text
-        )
+        raise RuntimeError(f"Failed to generate evaluation JSON: {last_error}")
