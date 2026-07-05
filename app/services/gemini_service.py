@@ -1,3 +1,4 @@
+import base64
 import json
 import os
 from typing import Any
@@ -6,7 +7,7 @@ from dotenv import load_dotenv
 from google import genai
 from google.genai import types
 
-from app.utils.config import EVALUATION_MODELS, TEXT_GENERATOR_MODELS
+from app.utils.config import EVALUATION_MODELS, IMAGE_GENERATION_MODELS, TEXT_GENERATOR_MODELS
 
 
 class GeminiService:
@@ -36,12 +37,44 @@ class GeminiService:
                     model=model,
                     contents=prompt,
                 )
-                return response.text.strip()
+                text = getattr(response, "text", None)
+                if text:
+                    return text.strip()
+                raise RuntimeError("Gemini returned an empty response.")
             except Exception as exc:
                 last_error = exc
                 print(f"Error with model {model}: {exc}")
 
         raise RuntimeError(f"Failed to generate content: {last_error}")
+
+    def generate_image(self, prompt: str) -> str:
+        if not self.client:
+            raise RuntimeError("Gemini API is not available. Please configure GEMINI_API_KEY.")
+
+        last_error = None
+        for model in IMAGE_GENERATION_MODELS:
+            try:
+                print(f"Trying to generate image with model: {model}")
+                response = self.client.models.generate_images(
+                    model=model,
+                    prompt=prompt,
+                    config=types.GenerateImagesConfig(
+                        number_of_images=1,
+                        output_mime_type="image/jpeg",
+                        output_compression_quality=90,
+                    ),
+                )
+                generated_image = response.generated_images[0].image
+                image_bytes = generated_image.image_bytes
+                if image_bytes:
+                    encoded = base64.b64encode(image_bytes).decode("ascii")
+                    return f"data:image/jpeg;base64,{encoded}"
+                raise RuntimeError("Gemini returned an empty image payload.")
+            except Exception as exc:
+                last_error = exc
+                print(f"Error with image model {model}: {exc}")
+
+        raise RuntimeError(f"Failed to generate image: {last_error}")
 
     def generate_json(
         self,

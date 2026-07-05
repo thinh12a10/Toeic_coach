@@ -17,6 +17,7 @@ const imagePlaceholderEl = document.getElementById("image-placeholder");
 const transcriptEl = document.getElementById("transcript-result");
 const resultEl = document.getElementById("evaluation-result");
 const startBtn = document.getElementById("start-record-btn");
+const startQuestionBtn = document.getElementById("start-question-btn");
 const nextBtn = document.getElementById("next-question-btn");
 const backBtn = document.getElementById("back-btn");
 const loadingImageEl = document.getElementById("loading-image-indicator");
@@ -92,13 +93,13 @@ function renderQuestion(question) {
 
     currentTranscript = "";
     if (transcriptEl) {
-        transcriptEl.textContent = "Press Start Record to begin.";
+        transcriptEl.textContent = "Click Start to load a picture prompt.";
     }
 
     if (resultEl) {
         resultEl.innerHTML = `
             <div class="empty-state">
-                <strong>Press Start Record to begin.</strong>
+                <strong>Click Start to load a picture prompt.</strong>
                 <p>Your speech transcript and AI feedback will appear here once recording is complete.</p>
             </div>
         `;
@@ -317,12 +318,12 @@ function resetPage() {
         imagePlaceholderEl.querySelector("p").textContent = "Use the controls below to load the next prompt.";
     }
     if (transcriptEl) {
-        transcriptEl.textContent = "Press Start Record to begin.";
+        transcriptEl.textContent = "Click Start to load a picture prompt.";
     }
     if (resultEl) {
         resultEl.innerHTML = `
             <div class="empty-state">
-                <strong>Press Start Record to begin.</strong>
+                <strong>Click Start to load a picture prompt.</strong>
                 <p>Your speech transcript and AI feedback will appear here once recording is complete.</p>
             </div>
         `;
@@ -363,8 +364,19 @@ function initializeSpeechRecognition() {
     return recognition;
 }
 
+if (startQuestionBtn) {
+    startQuestionBtn.addEventListener("click", () => {
+        loadQuestion();
+    });
+}
+
 if (startBtn) {
-    startBtn.addEventListener("click", startRecording);
+    startBtn.addEventListener("click", async () => {
+        if (!currentQuestion) {
+            await loadQuestion();
+        }
+        startRecording();
+    });
 }
 
 if (nextBtn) {
@@ -384,4 +396,4 @@ window.addEventListener("beforeunload", () => {
 });
 
 initializeSpeechRecognition();
-loadQuestion();
+resetPage();

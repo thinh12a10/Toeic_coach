@@ -1,12 +1,11 @@
 <svg xmlns='http://www.w3.org/2000/svg' width='1200' height='800'>
   <rect width='100%' height='100%' fill='#f8fafc'/>
   <rect x='40' y='40' width='1120' height='720' rx='24' fill='#ffffff' stroke='#cbd5e1' stroke-width='3'/>
-  <rect x='90' y='120' width='420' height='260' rx='20' fill='#dbeafe'/>
-  <rect x='620' y='140' width='420' height='240' rx='20' fill='#dcfce7'/>
-  <circle cx='260' cy='250' r='70' fill='#fde68a'/>
-  <rect x='180' y='320' width='160' height='120' rx='20' fill='#60a5fa'/>
-  <rect x='700' y='220' width='220' height='110' rx='20' fill='#f9a8d4'/>
-  <rect x='950' y='220' width='80' height='110' rx='20' fill='#86efac'/>
-  <text x='600' y='520' text-anchor='middle' font-family='Arial, sans-serif' font-size='28' fill='#1e3a8a'>Picture prompt for TOEIC Speaking Part 2</text>
-  <text x='600' y='565' text-anchor='middle' font-family='Arial, sans-serif' font-size='22' fill='#475569'>A sample scene to describe in English.</text>
+  <rect x='120' y='150' width='420' height='260' rx='24' fill='#dbeafe'/>
+  <circle cx='330' cy='280' r='90' fill='#fde68a'/>
+  <rect x='650' y='180' width='340' height='220' rx='20' fill='#dcfce7'/>
+  <rect x='210' y='450' width='300' height='120' rx='20' fill='#bfdbfe'/>
+  <path d='M760 360 L820 280 L900 360 Z' fill='#f59e0b'/>
+  <text x='600' y='620' text-anchor='middle' font-family='Arial, sans-serif' font-size='28' fill='#1e3a8a'>Picture prompt for TOEIC Speaking Part 2</text>
+  <text x='600' y='665' text-anchor='middle' font-family='Arial, sans-serif' font-size='22' fill='#475569'>A sample scene to describe in English.</text>
 </svg>
