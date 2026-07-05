@@ -15,6 +15,27 @@ class Part1QuestionResponse(BaseModel):
     image_url: Optional[str] = None
 
 
+class Part3Question(BaseModel):
+    id: str
+    question_number: int
+    part: int
+    task_type: str
+    instruction: str
+    preparation_time: int
+    response_time: int
+    text: str
+    topic: str
+
+
+class Part3QuestionResponse(BaseModel):
+    id: str
+    part: int
+    task_type: str
+    instruction: str
+    topic: str
+    questions: list[Part3Question]
+
+
 class EvaluationCategory(BaseModel):
     score: float
     strengths: list[str]
@@ -42,6 +63,18 @@ class PronunciationEvaluation(BaseModel):
     improvement_tips: list[str]
 
 class Part1EvaluationResponse(BaseModel):
+    pronunciation: PronunciationEvaluation
+    intonation: EvaluationCategory
+    pacing: EvaluationCategory
+
+    overall_feedback: str
+
+    total_score: float
+
+    study_plan: list[str]
+    transcript: Optional[str] = None
+
+class Part3EvaluationResponse(BaseModel):
     pronunciation: PronunciationEvaluation
     intonation: EvaluationCategory
     pacing: EvaluationCategory
