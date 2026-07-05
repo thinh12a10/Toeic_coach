@@ -2,9 +2,9 @@ from typing import Optional
 
 from pydantic import BaseModel
 
-
-class Part1QuestionResponse(BaseModel):
+class Part3Question(BaseModel):
     id: str
+    question_number: int
     part: int
     task_type: str
     instruction: str
@@ -12,7 +12,16 @@ class Part1QuestionResponse(BaseModel):
     response_time: int
     text: str
     topic: str
-    image_url: Optional[str] = None
+
+
+class Part3QuestionResponse(BaseModel):
+    id: str
+    part: int
+    task_type: str
+    instruction: str
+    topic: str
+    questions: list[Part3Question]
+
 
 class EvaluationCategory(BaseModel):
     score: float
@@ -21,7 +30,7 @@ class EvaluationCategory(BaseModel):
     improvement_tips: list[str]
 
 
-class PronunciationEvaluation(BaseModel):
+class PronunciationEvaluationPart3(BaseModel):
     score: float
 
     strengths: list[str]
@@ -40,8 +49,8 @@ class PronunciationEvaluation(BaseModel):
 
     improvement_tips: list[str]
 
-class Part1EvaluationResponse(BaseModel):
-    pronunciation: PronunciationEvaluation
+class Part3EvaluationResponse(BaseModel):
+    pronunciation: PronunciationEvaluationPart3
     intonation: EvaluationCategory
     pacing: EvaluationCategory
 

@@ -1,6 +1,6 @@
 from fastapi import APIRouter, File, Form, UploadFile
 
-from app.models.part1_models import Part3EvaluationResponse, Part3QuestionResponse
+from app.models.part3_models import Part3EvaluationResponse, Part3QuestionResponse
 from app.services.part3_evaluation_service import Part3EvaluationService
 from app.services.part3_service import Part3Service
 
