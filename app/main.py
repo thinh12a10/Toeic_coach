@@ -16,6 +16,9 @@ from app.routers.part2_router import (
 from app.routers.part3_router import (
     router as part3_router
 )
+from app.routers.part4_router import (
+    router as part4_router
+)
 
 app = FastAPI(
     title="TOEIC AI",
@@ -30,6 +33,9 @@ app.include_router(
 )
 app.include_router(
     part3_router
+)
+app.include_router(
+    part4_router
 )
 
 app.mount(
@@ -76,4 +82,14 @@ def part3_page(
     return templates.TemplateResponse(
         request=request,
         name="part3.html"
+    )
+
+@app.get("/part4")
+def part4_page(
+    request: Request
+):
+
+    return templates.TemplateResponse(
+        request=request,
+        name="part4.html"
     )

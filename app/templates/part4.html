@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TOEIC Speaking - Part 4</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body>
+    <div class="page-shell">
+        <header class="part2-header">
+            <div>
+                <p class="eyebrow">TOEIC Speaking Practice</p>
+                <h1>TOEIC Speaking - Part 4</h1>
+                <p class="subtitle">Read a business document and answer telephone inquiries using only the information provided.</p>
+            </div>
+            <div id="question-number" class="header-badge">Question 8</div>
+        </header>
+
+        <main class="part2-grid">
+            <section class="panel">
+                <div class="panel-heading">
+                    <span>Business Document</span>
+                    <span>45s preparation</span>
+                </div>
+
+                <div id="loading-indicator" class="loading-indicator" style="display: none;">
+                    <span class="spinner"></span>
+                    <span class="loading-text">Loading practice set...</span>
+                </div>
+
+                <div class="prompt-card">
+                    <h3>Instruction</h3>
+                    <p>Read the document carefully. Then answer each caller’s question using only the information in the document.</p>
+                </div>
+
+                <div id="document-text" class="result-card">
+                    <h3>Document</h3>
+                    <p>Click Start to load the next Part 4 practice set.</p>
+                </div>
+
+                <div id="question-text" class="result-card">
+                    <h3>Question</h3>
+                    <p>Select a question to begin.</p>
+                </div>
+            </section>
+
+            <section class="panel">
+                <div class="panel-heading">
+                    <span>Evaluation Result</span>
+                    <span>AI Feedback</span>
+                </div>
+
+                <div id="loading-evaluation-indicator" class="loading-indicator" style="display: none;">
+                    <span class="spinner"></span>
+                    <span class="loading-text">Analyzing your response...</span>
+                </div>
+
+                <div id="evaluation-result">
+                    <div class="empty-state">
+                        <strong>Press Start Record to begin.</strong>
+                        <p>Your answer will be evaluated once recording is complete.</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <div class="controls-bar">
+            <div id="timer-display" class="timer-display">15s</div>
+            <div id="recording-status" class="recording-status">Ready</div>
+            <button id="start-question-btn">Start</button>
+            <button id="start-record-btn">Start Record</button>
+            <button id="next-question-btn" class="secondary-btn">Next Set</button>
+            <button id="back-btn" class="secondary-btn">Back</button>
+        </div>
+    </div>
+
+    <script src="/static/part4.js"></script>
+</body>
+
+</html>
