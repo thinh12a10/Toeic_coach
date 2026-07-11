@@ -1,7 +1,6 @@
 from fastapi import APIRouter, File, Form, UploadFile
 
-from app.models.part3_models import Part3EvaluationResponse
-from app.models.part5_models import Part5QuestionResponse
+from app.models.part5_models import Part5QuestionResponse, Part5EvaluationResponse
 from app.services.part5_evaluation_service import Part5EvaluationService
 from app.services.part5_service import Part5Service
 
@@ -16,7 +15,7 @@ def generate_questions():
     return question_service.generate_questions()
 
 
-@router.post("/evaluate", response_model=Part3EvaluationResponse)
+@router.post("/evaluate", response_model=Part5EvaluationResponse)
 async def evaluate(
     original_text: str = Form(...),
     audio: UploadFile = File(...),
