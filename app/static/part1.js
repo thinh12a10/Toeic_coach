@@ -4,6 +4,8 @@ let currentQuestion = null;
 
 let mediaRecorder = null;
 let audioChunks = [];
+let timerInterval = null;
+let timerLeft = 45;
 
 
 // =========================
@@ -75,7 +77,8 @@ async function startRecording() {
             };
 
         mediaRecorder.start();
-
+        resetTimer();
+        timerInterval = setInterval(updateTimer, 1000);
         alert("Recording started");
 
     } catch (error) {
@@ -96,6 +99,8 @@ function stopRecording() {
     if (!mediaRecorder) {
         return;
     }
+
+    resetTimer();
 
     mediaRecorder.onstop =
         async () => {
@@ -245,6 +250,25 @@ function resetPage() {
         "Waiting for evaluation...";
 }
 
+function resetTimer() {
+    timerLeft = 45;
+    document.getElementById(
+        "timer"
+    ).innerText = `Time Left: ${timerLeft}s`;
+}
+
+function updateTimer() {
+    if (timerLeft > 0) {
+        timerLeft--;
+        document.getElementById(
+            "timer"
+        ).innerText = `Time Left: ${timerLeft}s`;
+    } else {
+        stopRecording();
+        clearInterval(timerInterval);
+        alert("Time's up! Recording stopped.");
+    }
+}
 
 // =========================
 // Event Binding
