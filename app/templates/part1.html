@@ -1,67 +1,100 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
-    <title>TOEIC Speaking Part 1</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TOEIC Speaking Part 1 - Read Aloud</title>
 
     <link rel="stylesheet" href="/static/style.css">
 </head>
 
 <body>
 
-    <h1>TOEIC Speaking Part 1 - Read Aloud</h1>
+    <div class="page-shell">
 
-    <div class="container">
+        <header class="part2-header">
+            <div>
+                <p class="eyebrow">TOEIC Speaking Practice</p>
+                <h1>TOEIC Speaking Part 1 - Read Aloud</h1>
+                <p class="subtitle">Read the text aloud with clear pronunciation, correct accentuation, and natural
+                    tone.</p>
+            </div>
+            <div id="question-number" class="header-badge">Part 1</div>
+        </header>
 
-        <div class="left-panel">
+        <div class="container">
 
-            <h2>Question</h2>
+            <div class="left-panel">
 
-            <div id="loading-indicator" class="loading-indicator" style="display: none;">
-                <span class="spinner"></span>
-                <span class="loading-text">Loading question...</span>
+                <div class="panel-heading">
+                    <span>Question Prompt</span>
+                    <span>Read Aloud</span>
+                </div>
+
+                <div id="loading-indicator" class="loading-indicator" style="display: none;">
+                    <span class="spinner"></span>
+                    <span class="loading-text">Loading question...</span>
+                </div>
+
+                <div id="question-text">
+                    Click "Load Question"
+                </div>
+
             </div>
 
-            <div id="question-text">
-                Click "Next Question"
+            <div class="right-panel">
+
+                <div class="panel-heading">
+                    <span>Evaluation Result</span>
+                    <span>AI Feedback</span>
+                </div>
+
+                <div id="loading-evaluation-indicator" class="loading-indicator" style="display: none;">
+                    <span class="spinner"></span>
+                    <span class="loading-text">Evaluating...</span>
+                </div>
+
+                <div id="evaluation-result">
+                    <div class="empty-state">
+                        <strong>Click "Next Question" to load a passage.</strong>
+                        <p>Press "Start Recording" when you are ready to read the text aloud.</p>
+                    </div>
+                </div>
+
             </div>
 
         </div>
 
-        <div class="right-panel">
+        <div class="controls-bar">
 
-            <h2>Evaluation Result</h2>
-
-            <div id="loading-evaluation-indicator" class="loading-indicator" style="display: none;">
-                <span class="spinner"></span>
-                <span class="loading-text">Evaluating...</span>
+            <div class="timer-widget" id="timer-widget">
+                <div class="timer-badge">
+                    <span class="timer-icon">⏱️</span>
+                    <span class="timer-label">Time Remaining</span>
+                    <span id="timer-display" class="timer-value">45s</span>
+                    <span id="timer" style="display: none;">Time Left: 45s</span>
+                </div>
+                <div class="timer-bar-wrapper">
+                    <div id="timer-progress" class="timer-progress-bar" style="width: 100%;"></div>
+                </div>
             </div>
 
-            <div id="evaluation-result">
-            </div>
+            <div id="recording-status" class="recording-status">Ready</div>
+
+            <button id="next-btn">
+                Load Question
+            </button>
+
+            <button id="start-btn">
+                🎤 Start Recording
+            </button>
+
+            <button id="reset-btn" class="secondary-btn">
+                Reset
+            </button>
 
         </div>
-
-    </div>
-
-    <div class="controls">
-
-        <button id="next-btn">
-            Next Question
-        </button>
-
-        <button id="start-btn">
-            🎤 Start Recording
-        </button>
-
-        <button id="timer">
-            Time Left: 45s
-        </button>
-
-        <button id="reset-btn">
-            Reset
-        </button>
 
     </div>
 

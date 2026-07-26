@@ -7,48 +7,148 @@ let audioChunks = [];
 let timerInterval = null;
 let timerLeft = 45;
 
+const TOTAL_TIME = 45;
+
+// =========================
+// UI Helper Functions
+// =========================
+
+function getElements() {
+    return {
+        questionEl: document.getElementById("question-text"),
+        loadingEl: document.getElementById("loading-indicator"),
+        evaluationResultEl: document.getElementById("evaluation-result"),
+        loadingEvaluationEl: document.getElementById("loading-evaluation-indicator"),
+        timerDisplayEl: document.getElementById("timer-display"),
+        timerLegacyEl: document.getElementById("timer"),
+        timerProgressEl: document.getElementById("timer-progress"),
+        timerWidgetEl: document.getElementById("timer-widget"),
+        recordingStatusEl: document.getElementById("recording-status"),
+        nextBtn: document.getElementById("next-btn"),
+        startBtn: document.getElementById("start-btn"),
+        stopBtn: document.getElementById("stop-btn"),
+        resetBtn: document.getElementById("reset-btn")
+    };
+}
+
+function setRecordingState(isRecording) {
+    const { startBtn, stopBtn, recordingStatusEl, timerWidgetEl } = getElements();
+
+    if (startBtn) startBtn.disabled = isRecording;
+    if (stopBtn) stopBtn.disabled = !isRecording;
+
+    if (recordingStatusEl) {
+        if (isRecording) {
+            recordingStatusEl.innerText = "🔴 Recording...";
+            recordingStatusEl.classList.add("is-recording");
+        } else {
+            recordingStatusEl.innerText = "Ready";
+            recordingStatusEl.classList.remove("is-recording");
+        }
+    }
+
+    if (timerWidgetEl) {
+        if (isRecording) {
+            timerWidgetEl.classList.add("is-recording");
+        } else {
+            timerWidgetEl.classList.remove("is-recording", "warning");
+        }
+    }
+}
+
+function updateTimerUI() {
+    const { timerDisplayEl, timerLegacyEl, timerProgressEl, timerWidgetEl } = getElements();
+
+    const formattedTime = `${timerLeft}s`;
+
+    if (timerDisplayEl) {
+        timerDisplayEl.innerText = formattedTime;
+    }
+    if (timerLegacyEl) {
+        timerLegacyEl.innerText = `Time Left: ${formattedTime}`;
+    }
+
+    if (timerProgressEl) {
+        const percentage = Math.max(0, Math.min(100, (timerLeft / TOTAL_TIME) * 100));
+        timerProgressEl.style.width = `${percentage}%`;
+    }
+
+    if (timerWidgetEl) {
+        if (timerLeft <= 10 && timerLeft > 0) {
+            timerWidgetEl.classList.add("warning");
+        } else {
+            timerWidgetEl.classList.remove("warning");
+        }
+    }
+}
+
+function resetTimer() {
+    if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+    }
+    timerLeft = TOTAL_TIME;
+    updateTimerUI();
+}
+
+function updateTimer() {
+    if (timerLeft > 0) {
+        timerLeft--;
+        updateTimerUI();
+    } else {
+        if (timerInterval) {
+            clearInterval(timerInterval);
+            timerInterval = null;
+        }
+        stopRecording();
+    }
+}
+
 
 // =========================
 // Load Question
 // =========================
 
 async function loadQuestion() {
+    const { questionEl, loadingEl, nextBtn, evaluationResultEl } = getElements();
 
-    const questionEl = document.getElementById("question-text");
-    const loadingEl = document.getElementById("loading-indicator");
-    const nextBtn = document.getElementById("next-btn");
-
-    // Show loading indicator and disable button
     if (loadingEl) {
         loadingEl.style.display = "flex";
     }
-    questionEl.innerText = "";
-    nextBtn.disabled = true;
-    nextBtn.innerText = "Loading...";
+    if (questionEl) {
+        questionEl.innerText = "";
+    }
+    if (nextBtn) {
+        nextBtn.disabled = true;
+        nextBtn.innerText = "Loading...";
+    }
 
     try {
-        const response = await fetch(
-            "/api/part1/generate"
-        );
-
+        const response = await fetch("/api/part1/generate");
         currentQuestion = await response.json();
 
-        questionEl.innerText = currentQuestion.text;
-
-        document.getElementById(
-            "evaluation-result"
-        ).innerHTML = "Waiting for evaluation...";
+        if (questionEl) {
+            questionEl.innerText = currentQuestion.text;
+        }
+        if (evaluationResultEl) {
+            evaluationResultEl.innerHTML = `<div class="empty-state">
+                <strong>Question ready!</strong>
+                <p>Press "Start Recording" when you are ready to read aloud.</p>
+            </div>`;
+        }
     } catch (error) {
         console.error("Failed to load question:", error);
-        questionEl.innerText =
-            "Failed to load question. Please try again.";
+        if (questionEl) {
+            questionEl.innerText = "Failed to load question. Please try again.";
+        }
     } finally {
-        // Hide loading indicator and re-enable button
         if (loadingEl) {
             loadingEl.style.display = "none";
         }
-        nextBtn.disabled = false;
-        nextBtn.innerText = "Next Question";
+        if (nextBtn) {
+            nextBtn.disabled = false;
+            nextBtn.innerText = "Next Question";
+        }
     }
 }
 
@@ -58,34 +158,26 @@ async function loadQuestion() {
 // =========================
 
 async function startRecording() {
-
     try {
-
-        const stream =
-            await navigator.mediaDevices.getUserMedia({
-                audio: true
-            });
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
 
         audioChunks = [];
+        mediaRecorder = new MediaRecorder(stream);
 
-        mediaRecorder =
-            new MediaRecorder(stream);
-
-        mediaRecorder.ondataavailable =
-            event => {
+        mediaRecorder.ondataavailable = event => {
+            if (event.data.size > 0) {
                 audioChunks.push(event.data);
-            };
+            }
+        };
 
-        mediaRecorder.start();
         resetTimer();
+        mediaRecorder.start();
+        setRecordingState(true);
         timerInterval = setInterval(updateTimer, 1000);
-        alert("Recording started");
 
     } catch (error) {
-
-        console.error(error);
-
-        alert("Cannot access microphone");
+        console.error("Error accessing microphone:", error);
+        alert("Cannot access microphone. Please ensure microphone permissions are granted.");
     }
 }
 
@@ -95,28 +187,21 @@ async function startRecording() {
 // =========================
 
 function stopRecording() {
+    if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+    }
 
-    if (!mediaRecorder) {
+    setRecordingState(false);
+
+    if (!mediaRecorder || mediaRecorder.state === "inactive") {
         return;
     }
 
-    resetTimer();
-
-    mediaRecorder.onstop =
-        async () => {
-
-            const audioBlob =
-                new Blob(
-                    audioChunks,
-                    {
-                        type: "audio/webm"
-                    }
-                );
-
-            await evaluateAudio(
-                audioBlob
-            );
-        };
+    mediaRecorder.onstop = async () => {
+        const audioBlob = new Blob(audioChunks, { type: "audio/webm" });
+        await evaluateAudio(audioBlob);
+    };
 
     mediaRecorder.stop();
 }
@@ -126,57 +211,43 @@ function stopRecording() {
 // Evaluate Audio
 // =========================
 
-async function evaluateAudio(
-    audioBlob
-) {
+async function evaluateAudio(audioBlob) {
+    const { evaluationResultEl, loadingEvaluationEl } = getElements();
 
     if (!currentQuestion) {
-
-        alert(
-            "Generate a question first."
-        );
-
+        alert("Generate a question first.");
         return;
     }
 
-    const evaluateLoading = document.getElementById("loading-evaluation-indicator");
-    if (evaluateLoading) {
-        evaluateLoading.style.display = "flex";
+    if (loadingEvaluationEl) {
+        loadingEvaluationEl.style.display = "flex";
     }
 
-    const formData =
-        new FormData();
+    const formData = new FormData();
+    formData.append("original_text", currentQuestion.text);
+    formData.append("audio", audioBlob, "recording.webm");
 
-    formData.append(
-        "original_text",
-        currentQuestion.text
-    );
+    try {
+        const response = await fetch("/api/part1/evaluate", {
+            method: "POST",
+            body: formData
+        });
 
-    formData.append(
-        "audio",
-        audioBlob,
-        "recording.webm"
-    );
-
-    const response =
-        await fetch(
-            "/api/part1/evaluate",
-            {
-                method: "POST",
-                body: formData
-            }
-        );
-
-    const result =
-        await response.json();
-
-    if (evaluateLoading) {
-        evaluateLoading.style.display = "none";
+        const result = await response.json();
+        displayResult(result);
+    } catch (error) {
+        console.error("Failed to evaluate audio:", error);
+        if (evaluationResultEl) {
+            evaluationResultEl.innerHTML = `<div class="empty-state" style="color: #b71c1c;">
+                <strong>Evaluation failed.</strong>
+                <p>Please try recording again.</p>
+            </div>`;
+        }
+    } finally {
+        if (loadingEvaluationEl) {
+            loadingEvaluationEl.style.display = "none";
+        }
     }
-    
-    displayResult(
-        result
-    );
 }
 
 
@@ -185,48 +256,34 @@ async function evaluateAudio(
 // =========================
 
 function displayResult(result) {
+    const { evaluationResultEl } = getElements();
+    if (!evaluationResultEl) return;
 
-    document.getElementById(
-        "evaluation-result"
-    ).innerHTML = `
-        <h3>Total Score: ${result.total_score}</h3>
+    evaluationResultEl.innerHTML = `
+        <div class="result-card">
+            <h3>Total Score: ${result.total_score || 0} / 10</h3>
+        </div>
 
-        <hr>
+        <div class="score-card">
+            <strong>Pronunciation Score</strong>
+            <p>${result.pronunciation?.score ?? 'N/A'}</p>
+            ${result.pronunciation?.mispronounced_words?.length ? `<p><strong>Mispronounced Words:</strong> ${result.pronunciation.mispronounced_words.join(", ")}</p>` : ''}
+            ${result.pronunciation?.missing_end_sounds?.length ? `<p><strong>Missing End Sounds:</strong> ${result.pronunciation.missing_end_sounds.join(", ")}</p>` : ''}
+            ${result.pronunciation?.vowel_issues?.length ? `<p><strong>Vowel Issues:</strong> ${result.pronunciation.vowel_issues.join(", ")}</p>` : ''}
+        </div>
 
-        <h4>Pronunciation</h4>
+        <div class="result-card" style="margin-top: 12px;">
+            <h3>Overall Feedback</h3>
+            <p>${result.overall_feedback || "No feedback provided."}</p>
+        </div>
 
-        <p>Score: ${result.pronunciation.score}</p>
-
-        <p>
-            Mispronounced Words:
-            ${result.pronunciation.mispronounced_words.join(", ")}
-        </p>
-
-        <p>
-            Missing End Sounds:
-            ${result.pronunciation.missing_end_sounds.join(", ")}
-        </p>
-
-        <p>
-            Vowel Issues:
-            ${result.pronunciation.vowel_issues.join(", ")}
-        </p>
-
-        <hr>
-
-        <h4>Overall Feedback</h4>
-
-        <p>
-            ${result.overall_feedback}
-        </p>
-
-        <hr>
-
-        <h4>Study Plan</h4>
-
-        <ul>
-            ${result.study_plan.map(item => `<li>${item}</li>`).join("")}
-        </ul>
+        ${result.study_plan?.length ? `
+        <div class="result-card">
+            <h3>Study Plan</h3>
+            <ul>
+                ${result.study_plan.map(item => `<li>${item}</li>`).join("")}
+            </ul>
+        </div>` : ''}
     `;
 }
 
@@ -236,76 +293,39 @@ function displayResult(result) {
 // =========================
 
 function resetPage() {
-
     currentQuestion = null;
+    resetTimer();
+    setRecordingState(false);
 
-    document.getElementById(
-        "question-text"
-    ).innerHTML =
-        "Click 'Next Question'";
+    const { questionEl, evaluationResultEl } = getElements();
 
-    document.getElementById(
-        "evaluation-result"
-    ).innerHTML =
-        "Waiting for evaluation...";
-}
+    if (questionEl) {
+        questionEl.innerHTML = "Click 'Next Question'";
+    }
 
-function resetTimer() {
-    timerLeft = 45;
-    document.getElementById(
-        "timer"
-    ).innerText = `Time Left: ${timerLeft}s`;
-}
-
-function updateTimer() {
-    if (timerLeft > 0) {
-        timerLeft--;
-        document.getElementById(
-            "timer"
-        ).innerText = `Time Left: ${timerLeft}s`;
-    } else {
-        stopRecording();
-        clearInterval(timerInterval);
-        alert("Time's up! Recording stopped.");
+    if (evaluationResultEl) {
+        evaluationResultEl.innerHTML = `
+            <div class="empty-state">
+                <strong>Click "Next Question" to load a passage.</strong>
+                <p>Press "Start Recording" when you are ready to read aloud.</p>
+            </div>
+        `;
     }
 }
+
 
 // =========================
 // Event Binding
 // =========================
 
-document
-    .getElementById(
-        "next-btn"
-    )
-    .addEventListener(
-        "click",
-        loadQuestion
-    );
+document.addEventListener("DOMContentLoaded", () => {
+    const { nextBtn, startBtn, stopBtn, resetBtn } = getElements();
 
-document
-    .getElementById(
-        "start-btn"
-    )
-    .addEventListener(
-        "click",
-        startRecording
-    );
+    if (nextBtn) nextBtn.addEventListener("click", loadQuestion);
+    if (startBtn) startBtn.addEventListener("click", startRecording);
+    if (stopBtn) stopBtn.addEventListener("click", stopRecording);
+    if (resetBtn) resetBtn.addEventListener("click", resetPage);
 
-document
-    .getElementById(
-        "stop-btn"
-    )
-    .addEventListener(
-        "click",
-        stopRecording
-    );
-
-document
-    .getElementById(
-        "reset-btn"
-    )
-    .addEventListener(
-        "click",
-        resetPage
-    );
+    resetTimer();
+    setRecordingState(false);
+});
