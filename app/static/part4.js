@@ -23,22 +23,44 @@ const loadingIndicatorEl = document.getElementById("loading-indicator");
 const loadingEvaluationEl = document.getElementById("loading-evaluation-indicator");
 const evaluationResultEl = document.getElementById("evaluation-result");
 
-function resetTimer() {
-    clearInterval(timerInterval);
-    timeLeft = currentQuestion?.response_time || 15;
+let totalTime = 15;
+
+function updateTimerUI() {
     if (timerEl) {
         timerEl.textContent = `${timeLeft}s`;
     }
+    const timerProgressEl = document.getElementById("timer-progress");
+    if (timerProgressEl) {
+        const pct = totalTime > 0 ? Math.max(0, Math.min(100, (timeLeft / totalTime) * 100)) : 0;
+        timerProgressEl.style.width = `${pct}%`;
+    }
+    const timerWidgetEl = document.getElementById("timer-widget");
+    if (timerWidgetEl) {
+        if (timeLeft <= 10 && timeLeft > 0) {
+            timerWidgetEl.classList.add("warning");
+        } else {
+            timerWidgetEl.classList.remove("warning");
+        }
+    }
+}
+
+function resetTimer() {
+    if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+    }
+    totalTime = currentQuestion?.response_time || 15;
+    timeLeft = totalTime;
+    updateTimerUI();
 }
 
 function updateTimer() {
-    if (!timerEl) {
-        return;
-    }
-
-    timerEl.textContent = `${timeLeft}s`;
+    updateTimerUI();
     if (timeLeft <= 0) {
-        clearInterval(timerInterval);
+        if (timerInterval) {
+            clearInterval(timerInterval);
+            timerInterval = null;
+        }
         stopRecording();
         return;
     }
@@ -47,14 +69,28 @@ function updateTimer() {
 
 function setRecordingState(isRecording) {
     if (recordingStatusEl) {
-        recordingStatusEl.textContent = isRecording ? "Recording..." : "Ready";
+        recordingStatusEl.textContent = isRecording ? "🔴 Recording..." : "Ready";
         recordingStatusEl.classList.toggle("is-recording", isRecording);
+    }
+
+    const timerWidgetEl = document.getElementById("timer-widget");
+    if (timerWidgetEl) {
+        if (isRecording) {
+            timerWidgetEl.classList.add("is-recording");
+        } else {
+            timerWidgetEl.classList.remove("is-recording", "warning");
+        }
     }
 
     if (startBtn) {
         startBtn.disabled = isRecording;
-        startBtn.textContent = isRecording ? "Recording..." : "Start Record";
+        startBtn.textContent = isRecording ? "Recording..." : "🎤 Start Record";
     }
+
+    // const stopRecordBtn = document.getElementById("stop-record-btn");
+    // if (stopRecordBtn) {
+    //     stopRecordBtn.disabled = !isRecording;
+    // }
 }
 
 function showLoading(targetEl, label) {
@@ -281,6 +317,13 @@ if (startBtn) {
         startRecording();
     });
 }
+
+// const stopRecordBtn = document.getElementById("stop-record-btn");
+// if (stopRecordBtn) {
+//     stopRecordBtn.addEventListener("click", () => {
+//         stopRecording();
+//     });
+// }
 
 if (nextBtn) {
     nextBtn.addEventListener("click", nextQuestion);
