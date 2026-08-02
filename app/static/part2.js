@@ -88,10 +88,10 @@ function setRecordingState(isRecording) {
         startBtn.textContent = isRecording ? "Recording..." : "🎤 Start Record";
     }
 
-    const stopRecordBtn = document.getElementById("stop-record-btn");
-    if (stopRecordBtn) {
-        stopRecordBtn.disabled = !isRecording;
-    }
+    // const stopRecordBtn = document.getElementById("stop-record-btn");
+    // if (stopRecordBtn) {
+    //     stopRecordBtn.disabled = !isRecording;
+    // }
 }
 
 function showLoading(targetEl, label) {
@@ -414,12 +414,12 @@ if (startBtn) {
     });
 }
 
-const stopRecordBtn = document.getElementById("stop-record-btn");
-if (stopRecordBtn) {
-    stopRecordBtn.addEventListener("click", () => {
-        stopRecording();
-    });
-}
+// const stopRecordBtn = document.getElementById("stop-record-btn");
+// if (stopRecordBtn) {
+//     stopRecordBtn.addEventListener("click", () => {
+//         stopRecording();
+//     });
+// }
 
 if (nextBtn) {
     nextBtn.addEventListener("click", loadQuestion);
